@@ -10,7 +10,7 @@ VulNet is a modular framework designed for ethical vulnerability scanning and ex
 - **Advanced Port Scanning:**  
   Uses extended Nmap capabilities including OS detection, service/version identification, and default script scanning.
 
-- **Multiple Exploit Tests:**  
+- **Multiple Vulnerability Tests:**  
   Modules include:
   - SQL injection testing with parameter fuzzing.
   - Cross-Site Scripting (XSS) vulnerability explorations.
@@ -51,13 +51,7 @@ VulNet/
    cd VulNet
    ```
 
-2. **Set Up a Virtual Environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install Dependencies:**
+2. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
@@ -65,9 +59,9 @@ VulNet/
 ## Configuration
 
 Customize settings as needed for your scanning and testing requirements:
-- **Scanning Options:**  
+- **Network Scanning Options:**  
   Adjust port ranges, OS detection, service/version scanning, and Nmap scripts in `network_scanner.py`.
-- **Exploit Modules:**  
+- **Vulnerability Scanning Options:**  
   Modify payloads or extend functionalities in `vulnerability_scanner.py`.
 - **Logging:**  
   Logging levels and file paths are configurable in `utils.py`.
