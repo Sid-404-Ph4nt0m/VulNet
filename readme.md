@@ -1,4 +1,4 @@
-# VulNet: Advanced Vulnerability Scanner and Exploitation Framework
+# VulNet: Vulnerability and Network Scanner
 
 **Disclaimer:**  
 This project is intended for educational purposes and authorized security testing only. Do **NOT** use this tool against websites or systems without explicit, written permission. Unauthorized use may be illegal and unethical.
