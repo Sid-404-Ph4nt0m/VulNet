@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scan Results - VulNet Scanner</title>
+    <!-- Use Bootstrap via CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Add Font Awesome for icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Add custom Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #6C63FF;
+        --primary-hover: #8A84FF;
+        --secondary: #32343C;
+        --bg-dark: #121214;
+        --card-bg: #1A1B20;
+        /* Text colors to light shades */
+        --text-primary: #e0e0e0;
+        --text-secondary: #e0e0e0;
+        --border-color: #32343C;
+        --danger: #FF5C71;
+        --success: #4CAF50;
+        --warning: #F9A825;
+        --code-bg: #10111A;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        background-image:
+          radial-gradient(rgba(108, 99, 255, 0.08) 1px, transparent 1px),
+          radial-gradient(rgba(108, 99, 255, 0.08) 1px, transparent 1px);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+      }
+
+      /* Container fluid padding for full-screen usage with some spacing */
+      .container-fluid {
+        padding: 2rem;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        width: 100%;
+      }
+
+      .card-header {
+        border-bottom: 1px solid var(--border-color);
+        padding: 25px 30px;
+        background-color: rgba(26, 27, 32, 0.8);
+      }
+
+      .card-body {
+        padding: 30px;
+      }
+
+      .card-title {
+        color: var(--text-primary);
+        font-weight: 700;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card-title i {
+        color: var(--primary);
+      }
+
+      .section-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 20px;
+        margin: 25px 0 15px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title i {
+        color: var(--primary);
+      }
+
+      pre {
+        background-color: var(--code-bg);
+        color: var(--text-primary);
+        padding: 18px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo,
+          monospace;
+        font-size: 14px;
+        margin-bottom: 20px;
+        box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.2);
+        max-height: 500px;
+      }
+
+      .vuln-list {
+        list-style-type: none;
+        padding: 0;
+        margin-bottom: 20px;
+      }
+
+      .vuln-item {
+        background: rgba(28, 29, 34, 0.6);
+        padding: 14px 16px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        border-left: 3px solid var(--border-color);
+        font-size: 15px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        transition: all 0.2s ease;
+      }
+
+      .vuln-item:hover {
+        background: rgba(28, 29, 34, 0.8);
+        transform: translateX(2px);
+      }
+
+      .vuln-item.vulnerable {
+        border-left-color: var(--danger);
+      }
+
+      .vuln-item.secure {
+        border-left-color: var(--success);
+      }
+
+      .vuln-item.warning {
+        border-left-color: var(--warning);
+      }
+
+      .vuln-item i.fa-circle-xmark {
+        color: var(--danger);
+      }
+
+      .vuln-item i.fa-circle-check {
+        color: var(--success);
+      }
+
+      .vuln-item i.fa-circle-exclamation {
+        color: var(--warning);
+      }
+
+      .vuln-item strong {
+        color: #c8c8d0;
+        min-width: 120px;
+        display: inline-block;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        gap: 5px;
+      }
+
+      .status-badge.secure {
+        background-color: rgba(76, 175, 80, 0.15);
+        color: var(--success);
+      }
+
+      .status-badge.vulnerable {
+        background-color: rgba(255, 92, 113, 0.15);
+        color: var(--danger);
+      }
+
+      .status-badge.warning {
+        background-color: rgba(249, 168, 37, 0.15);
+        color: var(--warning);
+      }
+
+      .btn {
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        letter-spacing: 0.2px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 13px;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .btn-primary:hover,
+      .btn-primary:focus {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.35);
+      }
+
+      .btn-secondary {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+        color: var(--text-primary);
+      }
+
+      .btn-secondary:hover,
+      .btn-secondary:focus {
+        background-color: #42444E;
+        border-color: #42444E;
+        color: var(--text-primary);
+      }
+
+      .btn i {
+        margin-right: 8px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        justify-content: center;
+      }
+
+      .result-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(28, 29, 34, 0.5);
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        border: 1px solid var(--border-color);
+      }
+
+      .target-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .target-info i {
+        color: var(--primary);
+        font-size: 20px;
+      }
+
+      .target-info .target-url {
+        font-weight: 600;
+        font-size: 18px;
+      }
+
+      .scan-timestamp {
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .status-summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .divider {
+        height: 1px;
+        background-color: var(--border-color);
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      .card-footer {
+        background-color: rgba(28, 29, 34, 0.5);
+        border-top: 1px solid var(--border-color);
+        padding: 16px 30px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* Force light-colored text in all elements within the card body */
+      .card-body,
+      .card-body ul,
+      .card-body li,
+      .card-body h2,
+      .card-body h4,
+      .card-body strong,
+      .card-body span,
+      .card-body pre {
+        color: var(--text-primary) !important;
+      }
+
+      /* Make accordion items stand out a bit more */
+      .accordion-button {
+        background-color: rgba(28, 29, 34, 0.6);
+        color: var(--text-primary);
+      }
+
+      .accordion-button:focus {
+        box-shadow: none;
+      }
+
+      .accordion-button:not(.collapsed) {
+        background-color: rgba(28, 29, 34, 0.8);
+      }
+
+      .accordion-body {
+        background-color: rgba(28, 29, 34, 0.3);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .action-buttons {
+          flex-direction: column;
+        }
+        .btn {
+          width: 100%;
+        }
+        .result-summary {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 15px;
+        }
+        .status-summary {
+          margin-left: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">
+            <i class="fas fa-file-contract"></i> Scan Results
+          </h1>
+        </div>
+        <div class="card-body">
+          <div class="result-summary">
+            <div class="target-info">
+              <i class="fas fa-globe"></i>
+              <div>
+                <div class="target-url">{{ result.website }}</div>
+                <div class="scan-timestamp">Scanned on {{ now }}</div>
+              </div>
+            </div>
+            <div class="status-summary">
+              <div class="status-badge vulnerable">
+                <i class="fas fa-shield-alt"></i> Vulnerabilities Detected
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Network Scan Results Section -->
+            <div class="col-md-6">
+              <h2 class="section-title">
+                <i class="fas fa-network-wired"></i> Network Scan Results
+              </h2>
+              <!-- Bootstrap Accordion for each IP -->
+              <div class="accordion" id="networkScanAccordion">
+                {% for ip, scan in result.network_scan.items() %}
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ ip }}">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse-{{ ip }}"
+                        aria-expanded="false"
+                        aria-controls="collapse-{{ ip }}"
+                      >
+                        {{ ip }}
+                      </button>
+                    </h2>
+                    <div
+                      id="collapse-{{ ip }}"
+                      class="accordion-collapse collapse"
+                      aria-labelledby="heading-{{ ip }}"
+                      data-bs-parent="#networkScanAccordion"
+                    >
+                      <div class="accordion-body">
+                        <div class="table-responsive">
+                          <table class="table table-dark table-bordered table-sm">
+                            <tbody>
+                              <tr>
+                                <th>IPv4</th>
+                                <td>{{ scan.addresses.ipv4 }}</td>
+                              </tr>
+                              <tr>
+                                <th>Hostnames</th>
+                                <td>
+                                  <ul>
+                                    {% for hostname in scan.hostnames %}
+                                      <li>
+                                        {{ hostname.name }}
+                                        ({{ hostname.type }})
+                                      </li>
+                                    {% endfor %}
+                                  </ul>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Ports</th>
+                                <td>
+                                  <ul>
+                                    {% for port, portData in scan.ports.items() %}
+                                      <li>
+                                        <strong>{{ port }} ({{ portData.name }})</strong>
+                                        - State: {{ portData.state }},
+                                        Reason: {{ portData.reason }},
+                                        Product: {{ portData.product }},
+                                        Version: {{ portData.version }}
+                                        {% if portData.script is defined %}
+                                          <br /><em>Scripts:</em>
+                                          <ul>
+                                            {% for scriptName, scriptValue in portData.script.items() %}
+                                              <li>
+                                                {{ scriptName }}: {{ scriptValue }}
+                                              </li>
+                                            {% endfor %}
+                                          </ul>
+                                        {% endif %}
+                                      </li>
+                                    {% endfor %}
+                                  </ul>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>OS</th>
+                                <td>
+                                  {{ scan.os.name }}
+                                  (Accuracy: {{ scan.os.accuracy }}%)
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <h2 class="section-title">
+                <i class="fas fa-bug"></i> Network Vulnerabilities
+              </h2>
+              <ul class="vuln-list">
+                {% for vuln in result.network_vulnerabilities %}
+                  <li class="vuln-item vulnerable">
+                    <i class="fas fa-circle-xmark"></i>
+                    <span>{{ vuln }}</span>
+                  </li>
+                {% else %}
+                  <li class="vuln-item secure">
+                    <i class="fas fa-circle-check"></i>
+                    <span>No network vulnerabilities detected.</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <!-- Vulnerability Scan Results Section -->
+            <div class="col-md-6">
+              <h2 class="section-title">
+                <i class="fas fa-microscope"></i> Vulnerability Scan Results
+              </h2>
+              <!-- SQL Injection -->
+              {% set sql_injection_text = result.vulnerability_scan.sql_injection_test %}
+              <li
+                class="vuln-item
+                  {% if 'No' in sql_injection_text %}
+                    secure
+                  {% elif 'Potential' in sql_injection_text %}
+                    warning
+                  {% else %}
+                    vulnerable
+                  {% endif %}
+                "
+              >
+                <i
+                  class="fas
+                    {% if 'No' in sql_injection_text %}
+                      fa-circle-check
+                    {% elif 'Potential' in sql_injection_text %}
+                      fa-circle-exclamation
+                    {% else %}
+                      fa-circle-xmark
+                    {% endif %}
+                  "
+                ></i>
+                <strong>SQL Injection:</strong>
+                <span>{{ sql_injection_text }}</span>
+              </li>
+
+              <!-- XSS -->
+              {% set xss_text = result.vulnerability_scan.xss_test %}
+              <li
+                class="vuln-item
+                  {% if 'No' in xss_text %}
+                    secure
+                  {% elif 'Potential' in xss_text %}
+                    warning
+                  {% else %}
+                    vulnerable
+                  {% endif %}
+                "
+              >
+                <i
+                  class="fas
+                    {% if 'No' in xss_text %}
+                      fa-circle-check
+                    {% elif 'Potential' in xss_text %}
+                      fa-circle-exclamation
+                    {% else %}
+                      fa-circle-xmark
+                    {% endif %}
+                  "
+                ></i>
+                <strong>XSS:</strong>
+                <span>{{ xss_text }}</span>
+              </li>
+
+              <!-- Command Injection -->
+              {% set command_injection_text = result.vulnerability_scan.command_injection_test %}
+              <li
+                class="vuln-item
+                  {% if 'No' in command_injection_text %}
+                    secure
+                  {% elif 'Potential' in command_injection_text %}
+                    warning
+                  {% else %}
+                    vulnerable
+                  {% endif %}
+                "
+              >
+                <i
+                  class="fas
+                    {% if 'No' in command_injection_text %}
+                      fa-circle-check
+                    {% elif 'Potential' in command_injection_text %}
+                      fa-circle-exclamation
+                    {% else %}
+                      fa-circle-xmark
+                    {% endif %}
+                  "
+                ></i>
+                <strong>Command Injection:</strong>
+                <span>{{ command_injection_text }}</span>
+              </li>
+
+              <!-- Buffer Overflow -->
+              {% set buffer_text = result.vulnerability_scan.buffer_overflow_test %}
+              <li
+                class="vuln-item
+                  {% if 'No' in buffer_text %}
+                    secure
+                  {% elif 'Potential' in buffer_text %}
+                    warning
+                  {% else %}
+                    vulnerable
+                  {% endif %}
+                "
+              >
+                <i
+                  class="fas
+                    {% if 'No' in buffer_text %}
+                      fa-circle-check
+                    {% elif 'Potential' in buffer_text %}
+                      fa-circle-exclamation
+                    {% else %}
+                      fa-circle-xmark
+                    {% endif %}
+                  "
+                ></i>
+                <strong>Buffer Overflow:</strong>
+                <span>{{ buffer_text }}</span>
+              </li>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="action-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+              <i class="fas fa-arrow-left"></i> Back to Scanner
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+              <i class="fas fa-chart-line"></i> View Dashboard
+            </a>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div>
+            <i class="fas fa-shield-alt"></i> VulNet Scanner
+          </div>
+          <div>
+            <i class="fas fa-clock"></i>
+            Scan completed in
+            {{ result.scan_time if result.scan_time is defined else "N/A" }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    ></script>
+  </body>
+</html>

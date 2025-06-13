@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - VulNet Scanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #6C63FF;
+        --primary-hover: #8A84FF;
+        --secondary: #32343C;
+        --bg-dark: #121214;
+        --card-bg: #1A1B20;
+        --text-primary: #F6F6F8;
+        --text-secondary: #A0A0A8;
+        --border-color: #32343C;
+        --danger: #FF5C71;
+        --success: #4CAF50;
+        --warning: #F9A825;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        background-image: radial-gradient(rgba(108, 99, 255, 0.08) 1px, transparent 1px),
+          radial-gradient(rgba(108, 99, 255, 0.08) 1px, transparent 1px);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+      }
+      .container-fluid {
+        width: 100%;
+        padding: 0 20px;
+        margin-top: 8vh;
+      }
+      .card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 2rem;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      }
+      .card-header {
+        border-bottom: 1px solid var(--border-color);
+        padding: 25px 30px;
+      }
+      .card-body {
+        padding: 30px;
+      }
+      .card-title {
+        color: var(--text-primary);
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .card-title i {
+        color: var(--primary);
+      }
+      .page-title {
+        color: var(--text-primary);
+        font-weight: 700;
+        margin-bottom: 24px;
+        font-size: 2rem;
+      }
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .analytics-item {
+        background-color: rgba(28, 29, 34, 0.7);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .analytics-item .label {
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      .analytics-item .value {
+        color: var(--text-primary);
+        font-size: 24px;
+        font-weight: 700;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: var(--text-primary);
+        margin-top: 20px;
+      }
+      th {
+        background-color: rgba(28, 29, 34, 0.7);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        font-weight: 600;
+        padding: 14px 20px;
+        text-align: left;
+        font-size: 14px;
+      }
+      td {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 15px;
+        vertical-align: middle;
+      }
+      tbody tr:hover {
+        background-color: rgba(108, 99, 255, 0.05);
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .status-badge.secure {
+        background-color: rgba(76, 175, 80, 0.15);
+        color: var(--success);
+      }
+      .status-badge.vulnerable {
+        background-color: rgba(255, 92, 113, 0.15);
+        color: var(--danger);
+      }
+      .status-badge.scanning {
+        background-color: rgba(249, 168, 37, 0.15);
+        color: var(--warning);
+      }
+      .btn {
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        letter-spacing: 0.2px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 14px;
+        display: inline-block;
+        text-decoration: none;
+        text-align: center;
+      }
+      .btn-primary {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover,
+      .btn-primary:focus {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.35);
+      }
+      .btn i {
+        margin-right: 8px;
+      }
+      .card-footer {
+        background-color: rgba(28, 29, 34, 0.5);
+        border-top: 1px solid var(--border-color);
+        padding: 16px 30px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        display: flex;
+        justify-content: center;
+      }
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .container-fluid {
+          margin-top: 4vh;
+        }
+        .card-header,
+        .card-body,
+        .card-footer {
+          padding: 20px;
+        }
+        .analytics-grid {
+          grid-template-columns: 1fr;
+        }
+        .btn {
+          width: 100%;
+        }
+        table {
+          display: block;
+          overflow-x: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <h1 class="page-title">
+        <i class="fas fa-chart-line" style="color: var(--primary);"></i>
+        Dashboard &amp; Analytics
+      </h1>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="fas fa-chart-pie"></i>
+            Analytics Overview
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="analytics-grid">
+            <div class="analytics-item">
+              <div class="label">Total Scans</div>
+              <div class="value">{{ analytics.total_scans }}</div>
+            </div>
+            <div class="analytics-item">
+              <div class="label">Network Vulnerabilities</div>
+              <div class="value">{{ analytics.total_network_vulnerabilities }}</div>
+            </div>
+            <div class="analytics-item">
+              <div class="label">Application Vulnerabilities</div>
+              <div class="value">{{ analytics.total_vulnerability_scans }}</div>
+            </div>
+            <div class="analytics-item">
+              <div class="label">Latest Scan</div>
+              <div class="value" style="font-size: 16px;">{{ analytics.latest_scan }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="fas fa-history"></i>
+            Historical Scan Results
+          </h2>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Website</th>
+                <th>Network Vulns</th>
+                <th>SQLi</th>
+                <th>XSS</th>
+                <th>Cmd Inj</th>
+                <th>Buffer Ovrflw</th>
+                <th>Timestamp</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in history %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ entry.website }}</td>
+                <td>
+                  {% for vuln in entry.network_vulnerabilities %}
+                    <div>{{ vuln }}</div>
+                  {% endfor %}
+                </td>
+                <td>
+                  {% if "Potential" in entry.vulnerability_scan.sql_injection_test %}
+                    <span class="status-badge vulnerable">Vulnerable</span>
+                  {% else %}
+                    <span class="status-badge secure">Secure</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if "Potential" in entry.vulnerability_scan.xss_test %}
+                    <span class="status-badge vulnerable">Vulnerable</span>
+                  {% else %}
+                    <span class="status-badge secure">Secure</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if "Potential" in entry.vulnerability_scan.command_injection_test %}
+                    <span class="status-badge vulnerable">Vulnerable</span>
+                  {% else %}
+                    <span class="status-badge secure">Secure</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if "Potential" in entry.vulnerability_scan.buffer_overflow_test %}
+                    <span class="status-badge vulnerable">Vulnerable</span>
+                  {% else %}
+                    <span class="status-badge secure">Secure</span>
+                  {% endif %}
+                </td>
+                <td>{{ entry.timestamp }}</td>
+                <td>
+                  <a href="{{ url_for('indepth', website=entry.website, timestamp=entry.timestamp) }}" class="btn btn-primary btn-sm">
+                    View Details
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Scanner
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
